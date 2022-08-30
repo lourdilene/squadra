@@ -4,8 +4,23 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @OA\Schema(
+ *      title="Store Project request",
+ *      description="Store Project request body data",
+ *      type="object",
+ *      required={"nome, sobrenome"},
+ *      @OA\Property(property="nome", type="string", example="Fulano"),
+ *      @OA\Property(property="sobrenome", type="string", example="Souza"),
+ *      @OA\Property(property="idade", type="string", example="31"),
+ *      @OA\Property(property="login", type="string", example="fulano@gmail.com"),
+ *      @OA\Property(property="senha", type="password", example="123456"),
+ *      @OA\Property(property="status", type="int", example="1")
+ * )
+ */
 class StoreUpdatePessoaRequest extends FormRequest
 {
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -17,6 +32,7 @@ class StoreUpdatePessoaRequest extends FormRequest
     }
 
     /**
+     *
      * Get the validation rules that apply to the request.
      *
      * @return array<string, mixed>

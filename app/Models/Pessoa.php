@@ -17,6 +17,43 @@ class Pessoa extends Model
 
     protected $primaryKey = 'codigo_pessoa';
 
+    /** @OA\Schema(
+     *     schema="Pessoa",
+     *     required={"id", "name", "email", "password"},
+     *     @OA\Property(
+     *         property="id",
+     *         type="integer",
+     *         format="int32"
+     *     ),
+     *     @OA\Property(
+     *         property="name",
+     *         type="string"
+     *     ),
+     *     @OA\Property(
+     *         property="email",
+     *         type="string"
+     *     ),
+     *     @OA\Property(
+     *         property="email_verified_at",
+     *         type="string",
+     *         format="date-time"
+     *     ),
+     *     @OA\Property(
+     *         property="password",
+     *         type="string"
+     *     ),
+     *     @OA\Property(
+     *         property="created_at",
+     *         type="string",
+     *         format="date-time"
+     *     ),
+     *     @OA\Property(
+     *         property="updated_at",
+     *         type="string",
+     *         format="date-time"
+     *     )
+     * ),
+     */
     protected $fillable = [
         'nome',
         'sobrenome',

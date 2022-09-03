@@ -21,7 +21,7 @@ class PessoaResource extends JsonResource
      *     description="Data wrapper"
      * )
      *
-     * @var \App\Models\Pessoa[]
+     * @var \App\Models\Uf[]
      *
      *
      * Transform the resource into an array.
@@ -37,6 +37,7 @@ class PessoaResource extends JsonResource
             'sobrenome' => $this->sobrenome,
             'idade' => $this->idade,
             'status' => $this->status,
+            'enderecos' => EnderecoResource::collection($this->enderecos)
         ];
     }
 }

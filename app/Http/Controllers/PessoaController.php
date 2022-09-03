@@ -3,16 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUpdatePessoaRequest;
+use App\Http\Requests\StoreUpdateUfRequest;
+use App\Http\Resources\EnderecoCollection;
+use App\Http\Resources\EnderecoResource;
 use App\Http\Resources\PessoaResource;
+use App\Models\Endereco;
 use App\Models\Pessoa;
+use App\Models\Uf;
+use App\Repositories\PessoaRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Symfony\Component\Console\Input\Input;
+use function PHPUnit\Framework\isEmpty;
+use function PHPUnit\Framework\isNull;
 
 //use function GuzzleHttp\Psr7\Utils;
 
 class PessoaController extends Controller
 {
+    public function __construct(private PessoaRepository $pessoaRepository)
+    {
+    }
+
     /**
      * @OA\Get(
      *      path="/pessoa",
@@ -100,10 +114,14 @@ class PessoaController extends Controller
     public function store(StoreUpdatePessoaRequest $request)
     {
         try{
-            Pessoa::create($request->all());
-            return response()->json([
-                'mensagem' => 'Pessoa cadastrada com sucesso.',
-            ]);
+//            Pessoa::create($request->all());
+//            return response()->json([
+//                'mensagem' => 'Pessoa cadastrada com sucesso.',
+//            ]);
+
+            //Pessoa::create($request->all());
+            return response()->json($this->pessoaRepository->add($request), 200);
+            //return response()->json($request->all()));
 
         }catch(Exception $e){
             Log::error($e->getMessage());
@@ -139,6 +157,43 @@ class PessoaController extends Controller
             $pessoa->fill($request->all());
             $pessoa->save();
 
+            $enderecosCodigo = [];
+            foreach ($request->enderecos as $endereco) {
+
+                Log::alert('isset',[isset($endereco['codigoEndereco'])]);
+
+                if (!isset($endereco['codigoEndereco'])){
+
+                    Log::alert('não tem código endereco',[$endereco]);
+
+                    $novosEnderecos[] = new Endereco([
+                        'codigo_bairro' => $endereco['codigoBairro'],
+                        'codigo_pessoa' => $id,
+                        'nome_rua' => $endereco['nomeRua'],
+                        'numero' => $endereco['numero'],
+                        'complemento' => $endereco['complemento'],
+                        'cep' => $endereco['cep']
+                    ]);
+                }
+
+                if (isset($endereco['codigoEndereco'])){
+                    $pessoa->enderecos()->where('codigo_endereco', $endereco['codigoEndereco'])->update([
+                        //'codigo_pessoa' => $pessoa->codigo_pessoa,
+                        'codigo_endereco' => $endereco['codigoEndereco'],
+                        'codigo_bairro' => $endereco['codigoBairro'],
+                        'nome_rua' => $endereco['nomeRua'],
+                        'numero' => $endereco['numero'],
+                        'complemento' => $endereco['complemento'],
+                        'cep' => $endereco['cep']
+                    ]);
+
+                    $enderecosCodigo[] = $endereco['codigoEndereco'];
+                }
+            }
+
+            $pessoa->enderecos()->whereNotIn('codigo_endereco', $enderecosCodigo)->delete();
+            $pessoa->enderecos()->saveMany($novosEnderecos);
+
             return response()->json([$pessoa]);
         }catch(Exception $e){
             Log::error($e->getMessage());
@@ -158,5 +213,21 @@ class PessoaController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function filter(Request $request)
+    {
+        $parametros = $request->input();
+
+        if ($parametros){
+            foreach ($parametros as $index => $parametro) {
+                $indexConvertido = Str::snake($index, '_');
+                $clausulasWhere[] = [$indexConvertido, '=', $parametro];
+            }
+
+            return response()->json(Pessoa::Where($clausulasWhere)->get());
+        }
+
+        return response()->json(Pessoa::all());
     }
 }

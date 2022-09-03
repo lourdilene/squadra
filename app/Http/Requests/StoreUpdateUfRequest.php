@@ -20,7 +20,7 @@ use Illuminate\Support\Str;
  *      @OA\Property(property="status", type="int", example="1")
  * )
  */
-class StoreUpdatePessoaRequest extends FormRequest
+class StoreUpdateUfRequest extends FormRequest
 {
 
     /**
@@ -42,14 +42,10 @@ class StoreUpdatePessoaRequest extends FormRequest
     public function rules()
     {
         return [
+            'codigo_uf' => 'required',
+            'sigla' => 'required | min:2 | max:255',
             'nome' => 'required | min:3 | max:255',
-            'sobrenome' => 'required | min:3 | max:255',
-            'idade' => 'required | max:3',
-            'login' => 'required | min:3 | max:255',
-            'senha' => 'required | min:3 | max:255',
-            'status' => 'required',
-
-            'enderecos.*' => 'required'
+            'status' => 'required'
         ];
     }
 
@@ -61,12 +57,18 @@ class StoreUpdatePessoaRequest extends FormRequest
     public function messages()
     {
         return [
+            'sigla.required' => 'O campo :attribute é necessário',
             'nome.required' => 'O campo :attribute é necessário',
-            'sobrenome.required' => 'O campo :attribute é necessário',
-            'idade.required' => 'O campo :attribute é necessário',
-            'login.required' => 'O campo :attribute é necessário',
-            'senha.required' => 'O campo :attribute é necessário',
-            'status.required' => 'O campo :attribute é necessário',
+            'status.required' => 'O campo :attribute é necessário'
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        $teste = $this->merge([
+            'codigo_uf' => Str::snake($this->codigoUf, '_'),
+        ]);
+
+        Log::alert('Data prepareForValidation',[$teste]);
     }
 }

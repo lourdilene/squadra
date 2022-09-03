@@ -146,9 +146,7 @@
                         "title": "Data",
                         "description": "Data wrapper",
                         "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/Pessoa"
-                        }
+                        "items": {}
                     }
                 },
                 "type": "object",
@@ -164,9 +162,7 @@
                         "title": "Data",
                         "description": "Data wrapper",
                         "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/Pessoa"
-                        }
+                        "items": {}
                     }
                 },
                 "type": "object",

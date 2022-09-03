@@ -11,14 +11,13 @@ class Municipio extends Model
 
     public $timestamps = false;
 
-    protected $table = 'tb_municio';
+    protected $table = 'tb_municipio';
 
     public $incrementing = true;
 
     protected $primaryKey = 'codigo_municipio';
 
     protected $fillable = [
-        'codigo_municipio',
         'codigo_uf',
         'nome',
         'status'

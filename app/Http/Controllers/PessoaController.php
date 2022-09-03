@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUpdatePessoaRequest;
-use App\Http\Requests\StoreUpdateUfRequest;
+use App\Http\Requests\UpdateUfRequest;
 use App\Http\Resources\EnderecoCollection;
 use App\Http\Resources\EnderecoResource;
 use App\Http\Resources\PessoaResource;
@@ -177,7 +177,8 @@ class PessoaController extends Controller
                 }
 
                 if (isset($endereco['codigoEndereco'])){
-                    $pessoa->enderecos()->where('codigo_endereco', $endereco['codigoEndereco'])->update([
+
+                    $teste = [
                         //'codigo_pessoa' => $pessoa->codigo_pessoa,
                         'codigo_endereco' => $endereco['codigoEndereco'],
                         'codigo_bairro' => $endereco['codigoBairro'],
@@ -185,7 +186,9 @@ class PessoaController extends Controller
                         'numero' => $endereco['numero'],
                         'complemento' => $endereco['complemento'],
                         'cep' => $endereco['cep']
-                    ]);
+                    ];
+
+                    $pessoa->enderecos()->where('codigo_endereco', $endereco['codigoEndereco'])->update($teste);
 
                     $enderecosCodigo[] = $endereco['codigoEndereco'];
                 }

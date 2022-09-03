@@ -2,24 +2,43 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUpdateUfRequest;
 use App\Http\Requests\UpdateUfRequest;
-use App\Models\Bairro;
+use App\Models\Uf;
+use Exception;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-class BairroController
+abstract class BaseController extends Controller
 {
-    protected $classe = Bairro::class;
-
     public function index(Request $request)
     {
         return $this->classe::paginate($request->per_page);
     }
 
-    public function store(UpdateUfRequest $request)
+    public function store(FormRequest $request)
     {
-        Log::alert('Prepara Uf',[$request]);
-        return response()->json($this->classe::create($request->all(),201));
+        try{
+            if ($this->classe::where('sigla', $request->sigla)->exists()) {
+                return response()->json([
+                    'mensagem'=>'Não foi possível cadastrar, pois já existe um registro de UF com a mesma sigla.',
+                    'status' => '400'
+                ],400);
+            }
+
+            $this->classe::create($request->all());
+            return response()->json([
+                'mensagem'=>'UF cadastrada com sucesso.'
+            ],200);
+
+        }catch(Exception $e){
+            Log::error($e->getMessage());
+            return response()->json([
+                'mensagem'=>'Não foi possível cadastrar a UF.',
+                'status' => '503'
+            ],503);
+        }
     }
 
     public function show(int $id)

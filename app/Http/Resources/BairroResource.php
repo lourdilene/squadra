@@ -15,8 +15,7 @@ class BairroResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'codigoUF' => $this->codigo_uf,
-            'sigla' => $this->sigla,
+            'codigoMunicipio' => $this->codigo_municipio,
             'nome' => $this->nome,
             'status' => $this->status
         ];

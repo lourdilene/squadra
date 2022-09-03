@@ -3,26 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUpdatePessoaRequest;
-use App\Http\Requests\UpdateUfRequest;
-use App\Http\Resources\EnderecoCollection;
-use App\Http\Resources\EnderecoResource;
 use App\Http\Resources\PessoaResource;
-use App\Models\Endereco;
 use App\Models\Pessoa;
-use App\Models\Uf;
 use App\Repositories\PessoaRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Symfony\Component\Console\Input\Input;
-use function PHPUnit\Framework\isEmpty;
-use function PHPUnit\Framework\isNull;
-
-//use function GuzzleHttp\Psr7\Utils;
 
 class PessoaController extends Controller
 {
+    protected $classe = Pessoa::class;
+
     public function __construct(private PessoaRepository $pessoaRepository)
     {
     }
@@ -53,14 +45,24 @@ class PessoaController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         try{
-            $pessoas = Pessoa::all();
-            if (!$pessoas){
-                return response()->json([]);
+            $parametros = $request->input();
+
+            if ($parametros){
+                foreach ($parametros as $index => $parametro) {
+                    $clausulasWhere[] = [Str::snake($index, '_'), '=', $parametro];
+                }
+                $resource = $this->classe::Where($clausulasWhere)->get()->first();
+
+                if (!$resource){
+                    return response()->json([]);
+                }
+                return response()->json(new PessoaResource($resource));
             }
-            return response()->json($pessoas);
+
+            return response()->json(PessoaResource::collection($this->classe::all()));
 
         }catch(Exception $e){
             Log::error($e->getMessage());
@@ -114,14 +116,11 @@ class PessoaController extends Controller
     public function store(StoreUpdatePessoaRequest $request)
     {
         try{
-//            Pessoa::create($request->all());
-//            return response()->json([
-//                'mensagem' => 'Pessoa cadastrada com sucesso.',
-//            ]);
+            $this->pessoaRepository->add($request);
 
-            //Pessoa::create($request->all());
-            return response()->json($this->pessoaRepository->add($request), 200);
-            //return response()->json($request->all()));
+            return response()->json([
+                'mensagem'=>'Pessoa cadastrada com sucesso.'
+            ],200);
 
         }catch(Exception $e){
             Log::error($e->getMessage());
@@ -132,72 +131,14 @@ class PessoaController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function update(StoreUpdatePessoaRequest $request, int $id)
     {
         try{
-            $pessoa = Pessoa::findOrFail($id);
-            $pessoa->fill($request->all());
-            $pessoa->save();
+            $pessoa = $this->pessoaRepository->update($request, $id);
 
-            $enderecosCodigo = [];
-            foreach ($request->enderecos as $endereco) {
-
-                Log::alert('isset',[isset($endereco['codigoEndereco'])]);
-
-                if (!isset($endereco['codigoEndereco'])){
-
-                    Log::alert('não tem código endereco',[$endereco]);
-
-                    $novosEnderecos[] = new Endereco([
-                        'codigo_bairro' => $endereco['codigoBairro'],
-                        'codigo_pessoa' => $id,
-                        'nome_rua' => $endereco['nomeRua'],
-                        'numero' => $endereco['numero'],
-                        'complemento' => $endereco['complemento'],
-                        'cep' => $endereco['cep']
-                    ]);
-                }
-
-                if (isset($endereco['codigoEndereco'])){
-
-                    $teste = [
-                        //'codigo_pessoa' => $pessoa->codigo_pessoa,
-                        'codigo_endereco' => $endereco['codigoEndereco'],
-                        'codigo_bairro' => $endereco['codigoBairro'],
-                        'nome_rua' => $endereco['nomeRua'],
-                        'numero' => $endereco['numero'],
-                        'complemento' => $endereco['complemento'],
-                        'cep' => $endereco['cep']
-                    ];
-
-                    $pessoa->enderecos()->where('codigo_endereco', $endereco['codigoEndereco'])->update($teste);
-
-                    $enderecosCodigo[] = $endereco['codigoEndereco'];
-                }
-            }
-
-            $pessoa->enderecos()->whereNotIn('codigo_endereco', $enderecosCodigo)->delete();
-            $pessoa->enderecos()->saveMany($novosEnderecos);
-
-            return response()->json([$pessoa]);
+            return response()->json(
+                PessoaResource::collection($pessoa::all())
+            ,200);
         }catch(Exception $e){
             Log::error($e->getMessage());
             return response()->json([
@@ -205,17 +146,6 @@ class PessoaController extends Controller
                 'status' => '503'
             ],503);
         }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 
     public function filter(Request $request)

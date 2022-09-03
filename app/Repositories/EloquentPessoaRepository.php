@@ -6,7 +6,6 @@ use App\Http\Requests\StoreUpdatePessoaRequest;
 use App\Models\Endereco;
 use App\Models\Pessoa;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class EloquentPessoaRepository implements PessoaRepository
 {
@@ -16,13 +15,9 @@ class EloquentPessoaRepository implements PessoaRepository
             $pessoa= new Pessoa($request->all());
             $pessoa->save();
 
-            Log::alert('request teste',[$pessoa]);
-
             foreach ($request->enderecos as $endereco) {
-                Log::alert('enderecoRepostity',[$request->enderecos]);
                 $enderecos[] = [
                     'codigo_pessoa' => $pessoa->codigo_pessoa,
-                    //'codigo_endereco' => $endereco['codigoEndereco'],
                     'codigo_bairro' => $endereco['codigoBairro'],
                     'nome_rua' => $endereco['nomeRua'],
                     'numero' => $endereco['numero'],
@@ -30,8 +25,51 @@ class EloquentPessoaRepository implements PessoaRepository
                     'cep' => $endereco['cep']
                 ];
             }
-
             Endereco::insert($enderecos);
+            return $pessoa;
+        });
+    }
+
+    public function update($request,$id): Pessoa
+    {
+        return DB::transaction(function () use ($request, $id) {
+            $pessoa = Pessoa::findOrFail($id);
+            $pessoa->fill($request->all());
+            $pessoa->save();
+
+            foreach ($request->enderecos as $endereco) {
+
+                if (!isset($endereco['codigoEndereco'])){
+
+                    $novosEnderecos[] = new Endereco([
+                        'codigo_bairro' => $endereco['codigoBairro'],
+                        'codigo_pessoa' => $id,
+                        'nome_rua' => $endereco['nomeRua'],
+                        'numero' => $endereco['numero'],
+                        'complemento' => $endereco['complemento'],
+                        'cep' => $endereco['cep']
+                    ]);
+                }
+
+                if (isset($endereco['codigoEndereco'])){
+
+                    $enderecosParaAtualizar = [
+                        'codigo_endereco' => $endereco['codigoEndereco'],
+                        'codigo_bairro' => $endereco['codigoBairro'],
+                        'nome_rua' => $endereco['nomeRua'],
+                        'numero' => $endereco['numero'],
+                        'complemento' => $endereco['complemento'],
+                        'cep' => $endereco['cep']
+                    ];
+
+                    $pessoa->enderecos()->where('codigo_endereco', $endereco['codigoEndereco'])->update($enderecosParaAtualizar);
+
+                    $codigosEnderecoRequest[] = $endereco['codigoEndereco'];
+                }
+            }
+
+            $pessoa->enderecos()->whereNotIn('codigo_endereco', $codigosEnderecoRequest)->delete();
+            $pessoa->enderecos()->saveMany($novosEnderecos);
 
             return $pessoa;
         });

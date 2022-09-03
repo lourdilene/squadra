@@ -8,4 +8,5 @@ use App\Models\Pessoa;
 interface PessoaRepository
 {
     public function add(StoreUpdatePessoaRequest $request): Pessoa;
+    public function update(StoreUpdatePessoaRequest $request, int $id): Pessoa;
 }

@@ -21,15 +21,13 @@ class BairroController
 
             if ($parametros){
                 foreach ($parametros as $index => $parametro) {
-                    if ($index == 'codigoUF'){
-                        $index = 'codigoUf';
-                    }
-                    $indexConvertido = Str::snake($index);
-                    Log::alert('snake',[$index, $indexConvertido]);
-                    $clausulasWhere[] = [$indexConvertido, '=', $parametro];
+                    $clausulasWhere[] = [Str::snake($index), '=', Str::upper($parametro)];
                 }
-
                 $resource = $this->classe::Where($clausulasWhere)->get()->first();
+
+                if (!$resource){
+                    return response()->json([]);
+                }
 
                 return response()->json(new BairroResource($resource));
             }

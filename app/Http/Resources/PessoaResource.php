@@ -32,12 +32,14 @@ class PessoaResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'codigo_pessoa' => $this->codigo_pessoa,
+            'codigoPessoa' => $this->codigo_pessoa,
             'nome' => $this->nome,
             'sobrenome' => $this->sobrenome,
             'idade' => $this->idade,
+            'login' => $this->login,
+            'senha' => $this->senha,
             'status' => $this->status,
-            'enderecos' => EnderecoResource::collection($this->enderecos)
+            'quantidadeEnderecos' =>count($this->enderecos)
         ];
     }
 }

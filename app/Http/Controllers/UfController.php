@@ -24,12 +24,15 @@ class UfController
                     if ($index == 'codigoUF'){
                         $index = 'codigoUf';
                     }
-                    $indexConvertido = Str::snake($index);
-                    Log::alert('snake',[$index, $indexConvertido]);
-                    $clausulasWhere[] = [$indexConvertido, '=', $parametro];
+                    $clausulasWhere[] = [Str::snake($index), '=', Str::upper($parametro)];
                 }
+                Log::alert('uf',[$clausulasWhere]);
 
                 $resource = $this->classe::Where($clausulasWhere)->get()->first();
+
+                if (!$resource){
+                    return response()->json([]);
+                }
 
                 return response()->json(new UfResource($resource));
             }

@@ -31,6 +31,10 @@ class MunicipioController
 
                 $resource = $this->classe::Where($clausulasWhere)->get()->first();
 
+                if (!$resource){
+                    return response()->json([]);
+                }
+
                 return response()->json(new MunicipioResource($resource));
             }
 

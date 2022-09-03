@@ -69,4 +69,11 @@ class StoreUpdatePessoaRequest extends FormRequest
             'status.required' => 'O campo :attribute é necessário',
         ];
     }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'codigo_uf' => $this->codigoUF
+        ]);
+    }
 }

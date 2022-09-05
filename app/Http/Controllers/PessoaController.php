@@ -147,20 +147,4 @@ class PessoaController extends Controller
             ],503);
         }
     }
-
-    public function filter(Request $request)
-    {
-        $parametros = $request->input();
-
-        if ($parametros){
-            foreach ($parametros as $index => $parametro) {
-                $indexConvertido = Str::snake($index, '_');
-                $clausulasWhere[] = [$indexConvertido, '=', $parametro];
-            }
-
-            return response()->json(Pessoa::Where($clausulasWhere)->get());
-        }
-
-        return response()->json(Pessoa::all());
-    }
 }

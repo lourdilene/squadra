@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 /**
@@ -48,8 +49,8 @@ class StoreUpdatePessoaRequest extends FormRequest
             'login' => 'required | min:3 | max:255',
             'senha' => 'required | min:3 | max:255',
             'status' => 'required',
-
-            'enderecos.*' => 'required'
+            'enderecos' => 'required',
+            'enderecos.*.codigoBairro' => 'required'
         ];
     }
 
@@ -67,13 +68,28 @@ class StoreUpdatePessoaRequest extends FormRequest
             'login.required' => 'O campo :attribute é necessário',
             'senha.required' => 'O campo :attribute é necessário',
             'status.required' => 'O campo :attribute é necessário',
+            'enderecos.required' => 'É necessário cadastrar pelo menos um endereço',
+            'enderecos.*.codigoBairro.required' => 'É necessário cadastrar um bairro'
         ];
     }
 
     protected function prepareForValidation()
     {
-        $this->merge([
-            'codigo_uf' => $this->codigoUF
-        ]);
+        return $this->merge(['enderecos' => $this->enderecos]);
+    }
+
+    public function requestComEnderecosFormatados ()
+    {
+        foreach ($this->enderecos as $endereco) {
+            $enderecos[] =
+                [
+                    'codigo_bairro' => $endereco['codigoBairro'],
+                    'nome_rua' => $endereco['nomeRua'],
+                    'numero' => $endereco['numero'],
+                    'complemento' => $endereco['complemento'],
+                    'cep' => $endereco['cep']
+                ];
+        }
+        return $this->merge(['enderecos' => $enderecos]);
     }
 }

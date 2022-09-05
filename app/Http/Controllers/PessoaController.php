@@ -116,7 +116,7 @@ class PessoaController extends Controller
     public function store(StoreUpdatePessoaRequest $request)
     {
         try{
-            $this->pessoaRepository->add($request);
+            $this->pessoaRepository->add($request->requestComEnderecosFormatados());
 
             return response()->json([
                 'mensagem'=>'Pessoa cadastrada com sucesso.'

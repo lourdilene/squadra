@@ -16,14 +16,7 @@ class EloquentPessoaRepository implements PessoaRepository
             $pessoa->save();
 
             foreach ($request->enderecos as $endereco) {
-                $enderecos[] = [
-                    'codigo_pessoa' => $pessoa->codigo_pessoa,
-                    'codigo_bairro' => $endereco['codigoBairro'],
-                    'nome_rua' => $endereco['nomeRua'],
-                    'numero' => $endereco['numero'],
-                    'complemento' => $endereco['complemento'],
-                    'cep' => $endereco['cep']
-                ];
+                $enderecos[] = array_merge($endereco, ['codigo_pessoa'=>$pessoa->codigo_pessoa]);
             }
             Endereco::insert($enderecos);
             return $pessoa;

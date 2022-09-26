@@ -18,7 +18,6 @@ class Pessoa extends Model
     protected $primaryKey = 'codigo_pessoa';
 
     protected $fillable = [
-        //'codigoPessoa',
         'nome',
         'sobrenome',
         'idade',

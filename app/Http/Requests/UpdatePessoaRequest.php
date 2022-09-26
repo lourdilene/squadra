@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Resources\EnderecoResource;
+use App\Models\Endereco;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -18,7 +20,7 @@ use Illuminate\Foundation\Http\FormRequest;
  *      @OA\Property(property="status", type="int", example="1")
  * )
  */
-class StoreUpdatePessoaRequest extends FormRequest
+class UpdatePessoaRequest extends FormRequest
 {
 
     /**
@@ -75,18 +77,20 @@ class StoreUpdatePessoaRequest extends FormRequest
         return $this->merge(['enderecos' => $this->enderecos]);
     }
 
-    public function requestComEnderecosFormatados ()
-    {
-        foreach ($this->enderecos as $endereco) {
-            $enderecos[] =
-                [
-                    'codigo_bairro' => $endereco['codigoBairro'],
-                    'nome_rua' => $endereco['nomeRua'],
-                    'numero' => $endereco['numero'],
-                    'complemento' => $endereco['complemento'],
-                    'cep' => $endereco['cep']
-                ];
-        }
-        return $this->merge(['enderecos' => $enderecos]);
-    }
+//    public function requestComEnderecosFormatados ()
+//    {
+//        foreach ($this->enderecos as $endereco) {
+//            $enderecos[] =
+//                [
+//                    new EnderecoResource([$endereco])
+////                    'codigo_endereco' => $endereco['codigoEndereco'],
+////                    'codigo_bairro' => $endereco['codigoBairro'],
+////                    'nome_rua' => $endereco['nomeRua'],
+////                    'numero' => $endereco['numero'],
+////                    'complemento' => $endereco['complemento'],
+////                    'cep' => $endereco['cep']
+//                ];
+//        }
+//        return $this->merge(['enderecos' => $enderecos]);
+//    }
 }

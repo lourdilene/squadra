@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Endereco;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 
@@ -84,16 +83,4 @@ class StorePessoaRequest extends FormRequest
         }
         return $this->merge(['enderecos' => $enderecos]);
     }
-
-//    public function requestComEnderecosFormatados ()
-//    {
-//        foreach ($this->enderecos as $endereco) {
-//            foreach (array_keys($endereco) as $key) {
-//                $keyFormat = Str::snake($key, '_');
-//                $enderecoToSnakeCase[$keyFormat] = $endereco[$key];
-//            }
-//            $enderecos[] = $enderecoToSnakeCase;
-//        }
-//        return $this->merge(['enderecos' => $enderecos]);
-//    }
 }

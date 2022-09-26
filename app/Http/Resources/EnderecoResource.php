@@ -19,12 +19,12 @@ class EnderecoResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'codigo_endereco' => $this->codigo_endereco,
-            'codigo_pessoa' => $this->codigo_pessoa,
-            'nome_rua' => $this->nome_rua,
-            'numero' => $this->numero,
-            'complemento' => $this->complemento,
-            'cep' => $this->cep,
+            'codigo_bairro' => $request['codigoBairro'],
+            'codigo_pessoa' => 1,
+            'nome_rua' => $request['nomeRua'],
+            'numero' => $request['numero'],
+            'complemento' => $request['complemento'],
+            'cep' => $request['cep']
         ];
     }
 }

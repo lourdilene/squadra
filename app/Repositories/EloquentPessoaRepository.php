@@ -2,14 +2,15 @@
 
 namespace App\Repositories;
 
-use App\Http\Requests\StoreUpdatePessoaRequest;
+use App\Http\Requests\StorePessoaRequest;
 use App\Models\Endereco;
 use App\Models\Pessoa;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class EloquentPessoaRepository implements PessoaRepository
 {
-    public function add(StoreUpdatePessoaRequest $request): Pessoa
+    public function add(StorePessoaRequest $request): Pessoa
     {
         return DB::transaction(function () use ($request) {
             $pessoa= new Pessoa($request->all());
@@ -19,6 +20,7 @@ class EloquentPessoaRepository implements PessoaRepository
                 $enderecos[] = array_merge($endereco, ['codigo_pessoa'=>$pessoa->codigo_pessoa]);
             }
             Endereco::insert($enderecos);
+
             return $pessoa;
         });
     }
@@ -35,6 +37,7 @@ class EloquentPessoaRepository implements PessoaRepository
                 if (!isset($endereco['codigoEndereco'])){
 
                     $novosEnderecos[] = new Endereco([
+                        //$teste
                         'codigo_bairro' => $endereco['codigoBairro'],
                         'codigo_pessoa' => $id,
                         'nome_rua' => $endereco['nomeRua'],
@@ -55,12 +58,19 @@ class EloquentPessoaRepository implements PessoaRepository
                         'cep' => $endereco['cep']
                     ];
 
+                    Log::alert('Para atualizar',[$enderecosParaAtualizar]);
+
                     $pessoa->enderecos()->where('codigo_endereco', $endereco['codigoEndereco'])->update($enderecosParaAtualizar);
 
                     $codigosEnderecoRequest[] = $endereco['codigoEndereco'];
                 }
             }
 
+            //$user = Endereco::first();
+
+            //dd($user->toArray());
+
+//            Log::alert('novos enderecos',[$novosEnderecos]);
             $pessoa->enderecos()->whereNotIn('codigo_endereco', $codigosEnderecoRequest)->delete();
             $pessoa->enderecos()->saveMany($novosEnderecos);
 

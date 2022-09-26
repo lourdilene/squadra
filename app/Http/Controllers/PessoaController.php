@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreUpdatePessoaRequest;
+use App\Http\Requests\StorePessoaRequest;
+use App\Http\Requests\UpdatePessoaRequest;
 use App\Http\Resources\PessoaResource;
 use App\Models\Pessoa;
 use App\Repositories\PessoaRepository;
@@ -29,7 +30,7 @@ class PessoaController extends Controller
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
-     *          @OA\JsonContent(ref="#/components/schemas/PessoaCollection")
+     *          @OA\JsonContent(ref="#/components/schemas/Pessoa")
      *       ),
      *      @OA\Response(
      *          response=401,
@@ -82,7 +83,7 @@ class PessoaController extends Controller
      *     description="Retorna mensagem de sucesso",
      *     @OA\RequestBody(
      *          required=true,
-     *          @OA\JsonContent(ref="#/components/schemas/StoreUpdatePessoaRequest"),
+     *          @OA\JsonContent(ref="#/components/schemas/StorePessoaRequest"),
      *     ),
      *     @OA\Response(
      *          response=200,
@@ -113,10 +114,10 @@ class PessoaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(StoreUpdatePessoaRequest $request)
+    public function store(StorePessoaRequest $request)
     {
         try{
-            $this->pessoaRepository->add($request->requestComEnderecosFormatados());
+            $this->pessoaRepository->add($request);
 
             return response()->json([
                 'mensagem'=>'Pessoa cadastrada com sucesso.'
@@ -131,7 +132,7 @@ class PessoaController extends Controller
         }
     }
 
-    public function update(StoreUpdatePessoaRequest $request, int $id)
+    public function update(UpdatePessoaRequest $request, int $id)
     {
         try{
             $pessoa = $this->pessoaRepository->update($request, $id);

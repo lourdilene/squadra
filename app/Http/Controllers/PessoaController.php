@@ -148,4 +148,12 @@ class PessoaController extends Controller
             ],503);
         }
     }
+
+    public function destroy(int $id)
+    {
+        $numberOfResource = $this->classe::destroy($id);
+        if ($numberOfResource === 0)
+            return response()->json(['Erro'=>'Recurso não encontrado'],404);
+        return response()->json('',204);
+    }
 }

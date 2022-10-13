@@ -47,7 +47,6 @@ class StorePessoaRequest extends FormRequest
             'login' => 'required | min:3 | max:255',
             'senha' => 'required | min:3 | max:255',
             'status' => 'required',
-            'codigoBairro' => 'required',
             'enderecos' => 'required',
             'enderecos.*.codigo_bairro' => 'required'
         ];

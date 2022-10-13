@@ -39,7 +39,8 @@ class PessoaResource extends JsonResource
             'login' => $this->login,
             'senha' => $this->senha,
             'status' => $this->status,
-            'quantidadeEnderecos' =>count($this->enderecos)
+            'quantidadeEnderecos' =>count($this->enderecos),
+            'enderecos' =>$this->enderecos
         ];
     }
 }
